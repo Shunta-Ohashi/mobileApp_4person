@@ -2,7 +2,6 @@ package jp.ac.meijou.android.schedule;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -50,10 +49,13 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         viewHolder.getTimeTextView().setText(currentItem.getTime());
         viewHolder.getScheduleTextView().setText(currentItem.getSchedule());
 
+        //もし、何か予定があるなら背景色を変更する
+        //用事ごとに背景色を変更する（予定）
         if(!"予定はありません".equals(currentItem.getSchedule())) {
             int lightBlue = Color.argb(128, 173, 216, 230);
             viewHolder.getScheduleTextView().setBackgroundColor(lightBlue);
         }
+        //用事がないなら背景色を元に戻す
         else {
             viewHolder.getScheduleTextView().setBackgroundColor(Color.TRANSPARENT);
         }

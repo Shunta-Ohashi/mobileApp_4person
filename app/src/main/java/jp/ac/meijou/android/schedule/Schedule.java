@@ -1,7 +1,5 @@
 package jp.ac.meijou.android.schedule;
 
-import java.sql.Time;
-
 public class Schedule {
     private String time;
     private String schedule;
