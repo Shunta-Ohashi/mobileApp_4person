@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    implementation libs.recyclerview
     coreLibraryDesugaring libs.desuger.jdk.libs
     implementation libs.appcompat
     implementation libs.material
