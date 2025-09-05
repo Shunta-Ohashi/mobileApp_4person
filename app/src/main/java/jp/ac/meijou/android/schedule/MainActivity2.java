@@ -1,6 +1,5 @@
 package jp.ac.meijou.android.schedule;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -11,12 +10,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import org.jetbrains.annotations.Async;
-
 import java.util.ArrayList;
 
 import jp.ac.meijou.android.schedule.databinding.ActivityMain2Binding;
-import jp.ac.meijou.android.schedule.databinding.ItemlistScheduleBinding;
 
 public class MainActivity2 extends AppCompatActivity {
 
@@ -36,6 +32,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        //時間とスケジュールをひとまとめにしたArrayListを作成する
         ArrayList<Schedule> scheduleData = new ArrayList<>();
         for (int i = 0; i < 48; i++) {
             if (i % 2 == 0) {
@@ -59,6 +56,5 @@ public class MainActivity2 extends AppCompatActivity {
             var intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         });
-
     }
 }
