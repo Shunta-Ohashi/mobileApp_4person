@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">schedule</string>
+    <string name="textsample">テスト</string>
 </resources>
