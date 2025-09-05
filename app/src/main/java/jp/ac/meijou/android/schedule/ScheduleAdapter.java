@@ -1,5 +1,6 @@
 package jp.ac.meijou.android.schedule;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,9 +45,18 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
 
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder viewHolder, final int position) {
+
         Schedule currentItem = localDataSet.get(position);
         viewHolder.getTimeTextView().setText(currentItem.getTime());
         viewHolder.getScheduleTextView().setText(currentItem.getSchedule());
+
+        if(!"予定はありません".equals(currentItem.getSchedule())) {
+            int lightBlue = Color.argb(128, 173, 216, 230);
+            viewHolder.getScheduleTextView().setBackgroundColor(lightBlue);
+        }
+        else {
+            viewHolder.getScheduleTextView().setBackgroundColor(Color.TRANSPARENT);
+        }
     }
 
     @Override

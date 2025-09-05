@@ -1,6 +1,7 @@
 package jp.ac.meijou.android.schedule;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Async;
 import java.util.ArrayList;
 
 import jp.ac.meijou.android.schedule.databinding.ActivityMain2Binding;
+import jp.ac.meijou.android.schedule.databinding.ItemlistScheduleBinding;
 
 public class MainActivity2 extends AppCompatActivity {
 
@@ -35,12 +37,28 @@ public class MainActivity2 extends AppCompatActivity {
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         ArrayList<Schedule> scheduleData = new ArrayList<>();
-        for (int i = 0; i < 24; i++) {
-            scheduleData.add(new Schedule(i + ":00", "予定はありません"));;
+        for (int i = 0; i < 48; i++) {
+            if (i % 2 == 0) {
+                scheduleData.add(new Schedule(i / 2 + ":00", "予定はありません"));
+            }
+            else {
+                scheduleData.add(new Schedule((i - 1) / 2 + ":30", "予定はありません"));
+            }
         }
+
+        //色変更できるかどうかのテスト用↓↓↓
+        int targetIndex = 20;
+        Schedule newSchedule = new Schedule("10:00","会議");
+        scheduleData.set(targetIndex, newSchedule);
+        //↑↑↑
 
         ScheduleAdapter adapter = new ScheduleAdapter(scheduleData);
         binding.recyclerView.setAdapter(adapter);
+
+        binding.buttonBack.setOnClickListener(view -> {
+            var intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        });
 
     }
 }
