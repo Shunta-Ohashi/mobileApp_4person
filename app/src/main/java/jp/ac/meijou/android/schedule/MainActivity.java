@@ -1,6 +1,7 @@
 package jp.ac.meijou.android.schedule;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,7 +53,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //てす
+        binding.button.setOnClickListener(view -> {
+            var intent = new Intent(this, MainActivity2.class);
+            startActivity(intent);
+        });
     }
 
     private void showAddScheduleDialog() {
