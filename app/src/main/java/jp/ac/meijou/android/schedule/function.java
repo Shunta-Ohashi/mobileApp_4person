@@ -6,7 +6,8 @@ import java.util.List;
 public class function {
 
     /** Habit用 指定した予定を duration 分だけ埋める */
-     private void occupy(habit[][] time, int h, int m, int duration, habit task) {
+    /**  例　tinme[15][1] = 15時30-59分  duration=1は30分を表す,task はString*/
+     public void occupy(habit[][] time, int h, int m, int duration, habit task) {
         int nh = h, nm = m;
         for (int i = 0; i < duration; i++) {
             time[nh][nm] = task;
@@ -17,7 +18,7 @@ public class function {
     }
 
     /** ToDo用 指定した予定を duration 分だけ埋める */
-    private void occupy(ToDo[][] time, int h, int m, int duration, ToDo task) {
+    public static void occupy(ToDo[][] time, int h, int m, int duration, ToDo task) {
         int nh = h, nm = m;
         for (int i = 0; i < duration; i++) {
             time[nh][nm] = task;
@@ -27,13 +28,13 @@ public class function {
         }
     }
 
-    /** duration 分の空き時間がある開始時刻をすべて返す（数値の組で） */
-    static List<TimeSlot> findFreeSlots(ToDo[][] time, int duration) {
-        List<TimeSlot> result = new ArrayList<>();
+    /** duration 分の空き時間がある開始時刻をすべて返す（time[h][m]の数字で） */
+    static List<int[]> findFreeSlots(ToDo[][] time, int duration) {
+        List<int[]> result = new ArrayList<>();
         for (int h = 0; h < 24; h++) {
             for (int m = 0; m < 2; m++) {
                 if (canFit(time, h, m, duration)) {
-                    result.add(new TimeSlot(h, m));
+                    result.add(new int[]{h, m});
                 }
             }
         }
@@ -52,8 +53,9 @@ public class function {
         return true;
     }
 
+
     /** ToDo を入れられる候補の開始時刻を探す */
-    static List<TimeSlot> findSlotsForTask(ToDo[][] time, ToDo task) {
+    static List<int[]> findSlotsForTask(ToDo[][] time, ToDo task) {
         return findFreeSlots(time, task.getDuration());
     }
 
@@ -76,12 +78,17 @@ public class function {
      List<TimeSlot> slots = findSlotsForTask(todoTime, newTask);
 
      // 出力
-     System.out.println("[" + newTask.getTitle() + "] を入れられる候補:");
-     for (TimeSlot slot : slots) {
-     System.out.println("開始: " + slot);
+
+     System.out.println("候補:");
+     for (int[] slot : slots) {
+     System.out.println("time[" + slot[0] + "][" + slot[1] + "]");
      }
-     }
-     }
+
+     出力結果
+
+     候補:
+     time[0][0]
+     time[0][1]
      */
 
     /** 時間を表す数値の組 */
@@ -97,7 +104,8 @@ public class function {
     }
 
     /** やるべき課題 ToDo */
-    private class ToDo {
+    public static class ToDo {
+
         private String title;
         private int duration; // 30分単位
 
