@@ -2,6 +2,7 @@ package jp.ac.meijou.android.schedule;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class function {
 
@@ -40,6 +41,36 @@ public class function {
         }
         return result;
     }
+    /**
+     * 空き時間候補からランダムに1つ選び、
+     * その開始時刻 (h1, m1) を返す
+     * 候補がない場合は null を返す
+     */
+    static int[] decideStartSlotRandom(ToDo[][] time, ToDo task) {
+        int duration = task.getDuration();
+        List<int[]> slots = findFreeSlots(time, duration);
+
+        if (slots.isEmpty()) {
+            System.out.println("空き時間がありません。");
+            return null;
+        }
+
+        // ランダムに1つの候補を選ぶ
+        Random rand = new Random();
+        int[] start = slots.get(rand.nextInt(slots.size()));
+        int h1 = start[0];
+        int m1 = start[1];
+
+        // ★ここで occupy() を呼び出して登録する
+        occupy(time, h1, m1, duration, task);
+
+        System.out.println("決定した開始時刻: " + h1 + "時" + (m1 == 0 ? "00分" : "30分"));
+        System.out.println("「" + task.getTitle() + "」を登録しました。");
+
+        // 開始時刻を返す
+        return new int[]{h1, m1};
+    }
+
 
     /** (h,m)から duration 分空いているか判定 */
     static boolean canFit(ToDo[][] time, int h, int m, int duration) {
@@ -59,38 +90,39 @@ public class function {
         return findFreeSlots(time, task.getDuration());
     }
 
+
     /**  動作例
+     package jp.ac.meijou.android.schedule;
+
+     public class MainTest {
      public static void main(String[] args) {
+
      // ToDo用の時間割
-     ToDo[][] todoTime = new ToDo[24][2];
+     function.ToDo[][] todoTime = new function.ToDo[24][2];
      // Habit用の時間割
-     habit[][] habitTime = new habit[24][2];
+     function.habit[][] habitTime = new function.habit[24][2];
 
      // Habitを入れる（生活習慣）
-     occupy(habitTime, 7, 0, 2, new habit("朝ごはん", 2));  // 7:00〜8:00
-     occupy(habitTime, 23, 0, 2, new habit("就寝", 2));     // 23:00〜翌1:00
-
+     function.occupy(habitTime, 7, 0, 2, new function.habit("朝ごはん", 2));  // 7:00〜8:00
+     function.occupy(habitTime, 23, 0, 2, new function.habit("就寝", 2));     // 23:00〜翌1:00
 
      // 新しいToDo
-     ToDo newTask = new ToDo("勉強", 2);
+     function.ToDo newTask = new function.ToDo("勉強", 2);
 
-     // 空き時間を探す
-     List<TimeSlot> slots = findSlotsForTask(todoTime, newTask);
+     // 空いている1つの時間帯を決定
+     int[] slot = function.decideSlot(todoTime, habitTime, newTask);
 
-     // 出力
-
-     System.out.println("候補:");
-     for (int[] slot : slots) {
-     System.out.println("time[" + slot[0] + "][" + slot[1] + "]");
+     if (slot != null) {
+     System.out.println("決定した時間帯:");
+     System.out.println("開始: time[" + slot[0] + "][" + slot[1] + "]");}
+     else {
+     System.out.println("空き時間がありません。");
+     }
+     }
      }
 
-     出力結果
 
-     候補:
-     time[0][0]
-     time[0][1]
      */
-
     /** 時間を表す数値の組 */
     private static class TimeSlot {
         int hour; // 時
@@ -124,7 +156,7 @@ public class function {
     }
 
     /** 生活習慣 Habit */
-    private class habit {
+    private static class habit {
         private String title;
         private int duration; // 30分単位
 
