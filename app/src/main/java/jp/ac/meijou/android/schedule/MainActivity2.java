@@ -43,7 +43,7 @@ public class MainActivity2 extends AppCompatActivity {
             }
         }
 
-        //色変更できるかどうかのテスト用↓↓↓
+        //予定変更テスト用↓↓↓
         int targetIndex1 = 20;   //何番目の配列に予定を追加するか
                                  //例）10:00なら20番目
         Schedule currentSchedule = scheduleData.get(targetIndex1);
