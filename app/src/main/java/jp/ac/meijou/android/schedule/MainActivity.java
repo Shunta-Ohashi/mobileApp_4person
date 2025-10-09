@@ -53,9 +53,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // スケジュール作成ボタンを押したらActivity2へ遷移する
         binding.button.setOnClickListener(view -> {
             var intent = new Intent(this, MainActivity2.class);
             startActivity(intent);
+        });
+
+        // 歯車ボタンを押したら Routine アクティビティへ遷移する
+        binding.buttonSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Routine.class);
+                startActivity(intent);
+            }
         });
     }
 
