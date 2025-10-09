@@ -44,9 +44,17 @@ public class MainActivity2 extends AppCompatActivity {
         }
 
         //色変更できるかどうかのテスト用↓↓↓
-        int targetIndex = 20;
-        Schedule newSchedule = new Schedule("10:00","会議");
-        scheduleData.set(targetIndex, newSchedule);
+        int targetIndex1 = 20;   //何番目の配列に予定を追加するか
+                                 //例）10:00なら20番目
+        Schedule currentSchedule = scheduleData.get(targetIndex1);
+        Schedule newSchedule = new Schedule(currentSchedule.getTime(),"会議");    //scheduleの欄のみ変更する
+        scheduleData.set(targetIndex1, newSchedule);
+
+        int targetIndex2 = 27;   //何番目の配列に予定を追加するか
+                                 //例）13:30なら27番目
+        Schedule currentSchedule2 = scheduleData.get(targetIndex2);
+        Schedule newSchedule2 = new Schedule(currentSchedule2.getTime(),"歯医者");    //scheduleの欄のみ変更する
+        scheduleData.set(targetIndex2, newSchedule2);
         //↑↑↑
 
         ScheduleAdapter adapter = new ScheduleAdapter(scheduleData);
