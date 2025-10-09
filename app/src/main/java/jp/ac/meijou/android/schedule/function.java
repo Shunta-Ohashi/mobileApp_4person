@@ -7,8 +7,8 @@ import java.util.Random;
 public class function {
 
     /** Habit用 指定した予定を duration 分だけ埋める */
-    /**  例　tinme[15][1] = 15時30-59分  duration=1は30分を表す,task はString*/
-     public void occupy(habit[][] time, int h, int m, int duration, habit task) {
+    /**  例　time[15][1] = 15時30-59分  duration=1は30分を表す,task はString*/
+    public void occupy(habit[][] time, int h, int m, int duration, habit task) {
         int nh = h, nm = m;
         for (int i = 0; i < duration; i++) {
             time[nh][nm] = task;
