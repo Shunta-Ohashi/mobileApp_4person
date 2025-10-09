@@ -156,9 +156,9 @@ public class function {
     }
 
     /** 生活習慣 Habit */
-    private static class habit {
-        private String title;
-        private int duration; // 30分単位
+    public static class habit {
+        public String title;
+        public int duration; // 30分単位
 
         public habit(String title, int duration) {
             this.title = title;
