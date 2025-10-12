@@ -1,5 +1,6 @@
 package jp.ac.meijou.android.schedule;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -156,7 +157,7 @@ public class function {
     }
 
     /** 生活習慣 Habit */
-    public static class habit {
+    public static class habit implements Serializable {
         public String title;
         public int duration; // 30分単位
 

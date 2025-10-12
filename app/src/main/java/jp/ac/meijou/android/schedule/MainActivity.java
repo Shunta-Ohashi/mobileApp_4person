@@ -37,6 +37,13 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Intent habitIntent = getIntent();// 習慣からhabitTime[][]データを受け取る
+        function.habit[][] habitTime = (function.habit[][]) habitIntent.getSerializableExtra("HabitTime");
+
+        if (habitTime != null) {
+            System.out.println("Routine画面からhabitTimeを受け取りました");
+        }
+
         // Window Insets のリスナー設定 (元のコードから)
         // ここでの findViewById は binding.main を使う方が一貫性があります
         ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, windowInsets) -> {
