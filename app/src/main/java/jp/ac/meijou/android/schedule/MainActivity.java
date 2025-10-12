@@ -107,14 +107,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-
+            //完成した予定表timeをmainactivity2へ送信
             Intent ResultIntent = new Intent(this, MainActivity2.class);
             intent.putExtra("time", (Serializable)time);
-
-                    // データ転送
-                    // データを MainActivity2 に渡す準備（必要ならここで Intent に入れる）
-                    //  必要ならIntentにデータを詰める（今後の拡張点）
-                    // intent.putExtra("scheduleList", ...);
 
             startActivity(intent);
             });
@@ -227,4 +222,3 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
