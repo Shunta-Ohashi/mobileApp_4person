@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton; // FABのインポート
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -106,6 +107,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+
+            Intent ResultIntent = new Intent(this, MainActivity2.class);
+            intent.putExtra("time", (Serializable)time);
+
                     // データ転送
                     // データを MainActivity2 に渡す準備（必要ならここで Intent に入れる）
                     //  必要ならIntentにデータを詰める（今後の拡張点）

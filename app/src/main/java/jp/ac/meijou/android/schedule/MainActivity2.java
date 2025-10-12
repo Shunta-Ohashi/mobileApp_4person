@@ -22,6 +22,14 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
+        Intent ResultIntent = getIntent();// 習慣からhabitTime[][]データを受け取る
+        function.ToDo[][] result = (function.ToDo[][]) ResultIntent.getSerializableExtra("time");
+
+        if (result != null) {
+            System.out.println("activity1画面からresultを受け取りました");
+        }
+
         binding = ActivityMain2Binding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -43,6 +51,26 @@ public class MainActivity2 extends AppCompatActivity {
             }
         }
 
+        for (int h = 0; h < 24; h++) {
+            for (int m = 0; m < 2; m++) {
+                if (result[h][m] != null) {
+                    String title = result[h][m].getTitle();
+                    int index = h * 2 + m; // 0〜47に変換
+
+                    // indexが範囲内なら更新
+                    if (index >= 0 && index < scheduleData.size()) {
+                        Schedule old = scheduleData.get(index);
+                        Schedule updated = new Schedule(old.getTime(), title);
+                        scheduleData.set(index, updated);
+                    }
+
+                    // デバッグ出力
+                    System.out.println(h + "時" + (m == 0 ? "00" : "30") + " → " + title);
+                }
+            }
+        }
+
+/*
         //予定変更テスト用↓↓↓
         int targetIndex1 = 20;   //何番目の配列に予定を追加するか
                                  //例）10:00なら20番目
@@ -56,10 +84,12 @@ public class MainActivity2 extends AppCompatActivity {
         Schedule newSchedule2 = new Schedule(currentSchedule2.getTime(),"歯医者");    //scheduleの欄のみ変更する
         scheduleData.set(targetIndex2, newSchedule2);
         //↑↑↑
+ */
 
         ScheduleAdapter adapter = new ScheduleAdapter(scheduleData);
         binding.recyclerView.setAdapter(adapter);
 
+    // 戻るボタン
         binding.buttonBack.setOnClickListener(view -> {
             var intent = new Intent(this, MainActivity.class);
             startActivity(intent);

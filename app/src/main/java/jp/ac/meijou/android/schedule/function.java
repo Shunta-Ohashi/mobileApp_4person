@@ -137,10 +137,10 @@ public class function {
     }
 
     /** やるべき課題 ToDo */
-    public static class ToDo {
+    public static class ToDo implements Serializable {
 
-        private String title;
-        private int duration; // 30分単位
+        public String title;
+        public int duration; // 30分単位
 
         public ToDo(String title, int duration) {
             this.title = title;
