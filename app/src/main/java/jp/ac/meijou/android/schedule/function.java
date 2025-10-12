@@ -15,7 +15,7 @@ public class function {
             time[nh][nm] = task;
             nm++;
             if (nm == 2) { nm = 0; nh++; }
-            if (nh >= 24) break;
+            if (nh >= 24){ nh = 0;}
         }
     }
 
@@ -26,7 +26,7 @@ public class function {
             time[nh][nm] = task;
             nm++;
             if (nm == 2) { nm = 0; nh++; }
-            if (nh >= 24) break;
+            if (nh >= 24){ nh = 0;}
         }
     }
 

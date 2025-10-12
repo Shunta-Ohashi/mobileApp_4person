@@ -68,6 +68,22 @@ public class MainActivity extends AppCompatActivity {
 
         //データ読み取り
             function.ToDo[][] time = new function.ToDo[24][2];
+
+        //受け取ったhabitTimeをtimeにコピー
+            if (habitTime != null) {
+                for (int h = 0; h < 24; h++) {
+                    for (int m = 0; m < 2; m++) {
+                        if (habitTime[h][m] != null) {
+                            // habit の内容を ToDo にコピー
+                            time[h][m] = new function.ToDo(
+                                    habitTime[h][m].getTitle(),
+                                    habitTime[h][m].getDuration()
+                            );
+                        }
+                    }
+                }
+            }
+
             // scheduleDataList の内容を ToDo オブジェクトに変換して配置
             for (Pair<String, Integer> data : scheduleDataList) {
                 String name = data.first;
