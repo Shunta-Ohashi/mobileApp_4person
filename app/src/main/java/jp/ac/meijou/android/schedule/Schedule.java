@@ -4,6 +4,7 @@ public class Schedule {
     private String time;
     private String schedule;
 
+
     public Schedule(String time, String schedule) {
         this.time = time;
         this.schedule = schedule;
