@@ -30,6 +30,8 @@ public class Routine extends AppCompatActivity {
         binding = ActivityRoutineBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        loadRoutineData();
+
         // ViewCompat.setOnApplyWindowInsetsListener の第1引数を binding.main に修正
         ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -118,6 +120,45 @@ public class Routine extends AppCompatActivity {
 
         // apply() を呼び出して非同期で保存を確定
         editor.apply();
+    }
+
+    // クラスの内側に追加
+    private void loadRoutineData() {
+        // 保存時と同じ名前 "RoutinePrefs" を指定してインスタンスを取得
+        SharedPreferences sharedPreferences = getSharedPreferences("RoutinePrefs", Context.MODE_PRIVATE);
+
+        // 各Viewに保存されたデータを読み込んでセットする
+        // 第2引数は、まだデータが保存されていない場合に表示される「デフォルト値」
+
+        // 睡眠
+        binding.Sleep.setChecked(sharedPreferences.getBoolean("sleep_is_checked", false));
+        binding.sleepStart.setText(sharedPreferences.getString("sleep_start_time", ""));
+        binding.sleepDuration.setText(sharedPreferences.getString("sleep_duration", ""));
+
+        // 朝食
+        binding.breakfast.setChecked(sharedPreferences.getBoolean("breakfast_is_checked", false));
+        binding.breakfastStart.setText(sharedPreferences.getString("breakfast_start_time", ""));
+        binding.breakfastDuration.setText(sharedPreferences.getString("breakfast_duration", ""));
+
+        // 昼食
+        binding.lunch.setChecked(sharedPreferences.getBoolean("lunch_is_checked", false));
+        binding.lunchStart.setText(sharedPreferences.getString("lunch_start_time", ""));
+        binding.lunchDuration.setText(sharedPreferences.getString("lunch_duration", ""));
+
+        // 夕食
+        binding.dinner.setChecked(sharedPreferences.getBoolean("dinner_is_checked", false));
+        binding.dinnerStart.setText(sharedPreferences.getString("dinner_start_time", ""));
+        binding.dinnerDuration.setText(sharedPreferences.getString("dinner_duration", ""));
+
+        // 風呂
+        binding.bath.setChecked(sharedPreferences.getBoolean("bath_is_checked", false));
+        binding.bathStart.setText(sharedPreferences.getString("bath_start_time", ""));
+        binding.bathDuration.setText(sharedPreferences.getString("bath_duration", ""));
+
+        // その他
+        binding.others1.setChecked(sharedPreferences.getBoolean("others1_is_checked", false));
+        binding.others1Start.setText(sharedPreferences.getString("others1_start_time", ""));
+        binding.others1Duration.setText(sharedPreferences.getString("others1_duration", ""));
     }
 
 private function.habit[][] saveHabitData() {
