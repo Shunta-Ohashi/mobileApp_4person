@@ -1,5 +1,6 @@
 package jp.ac.meijou.android.schedule;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -14,7 +15,7 @@ public class function {
             time[nh][nm] = task;
             nm++;
             if (nm == 2) { nm = 0; nh++; }
-            if (nh >= 24) break;
+            if (nh >= 24){ nh = 0;}
         }
     }
 
@@ -25,7 +26,7 @@ public class function {
             time[nh][nm] = task;
             nm++;
             if (nm == 2) { nm = 0; nh++; }
-            if (nh >= 24) break;
+            if (nh >= 24){ nh = 0;}
         }
     }
 
@@ -136,10 +137,10 @@ public class function {
     }
 
     /** やるべき課題 ToDo */
-    public static class ToDo {
+    public static class ToDo implements Serializable {
 
-        private String title;
-        private int duration; // 30分単位
+        public String title;
+        public int duration; // 30分単位
 
         public ToDo(String title, int duration) {
             this.title = title;
@@ -156,9 +157,9 @@ public class function {
     }
 
     /** 生活習慣 Habit */
-    private static class habit {
-        private String title;
-        private int duration; // 30分単位
+    public static class habit implements Serializable {
+        public String title;
+        public int duration; // 30分単位
 
         public habit(String title, int duration) {
             this.title = title;

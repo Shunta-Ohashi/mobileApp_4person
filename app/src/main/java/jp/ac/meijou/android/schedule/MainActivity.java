@@ -18,8 +18,10 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton; // FABのインポート
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
 import jp.ac.meijou.android.schedule.databinding.ActivityMainBinding;
 
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     // 表示するデータのリスト (より構造化されたデータクラスを使うのが理想)
-    private final List<Pair<String, String>> scheduleDataList = new ArrayList<>();
+    private final List<Pair<String, Integer>> scheduleDataList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,13 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this); // エッジトゥエッジ表示を有効化
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        Intent habitIntent = getIntent();// 習慣からhabitTime[][]データを受け取る
+        function.habit[][] habitTime = (function.habit[][]) habitIntent.getSerializableExtra("HabitTime");
+
+        if (habitTime != null) {
+            System.out.println("Routine画面からhabitTimeを受け取りました");
+        }
 
         // Window Insets のリスナー設定 (元のコードから)
         // ここでの findViewById は binding.main を使う方が一貫性があります
@@ -45,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
+        //予定を追加ボタン
         binding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -55,9 +64,58 @@ public class MainActivity extends AppCompatActivity {
 
         // スケジュール作成ボタンを押したらActivity2へ遷移する
         binding.button.setOnClickListener(view -> {
-            var intent = new Intent(this, MainActivity2.class);
+            Intent intent = new Intent(this, MainActivity2.class);
+
+
+        //データ読み取り
+            function.ToDo[][] time = new function.ToDo[24][2];
+
+        //受け取ったhabitTimeをtimeにコピー
+            if (habitTime != null) {
+                for (int h = 0; h < 24; h++) {
+                    for (int m = 0; m < 2; m++) {
+                        if (habitTime[h][m] != null) {
+                            // habit の内容を ToDo にコピー
+                            time[h][m] = new function.ToDo(
+                                    habitTime[h][m].getTitle(),
+                                    habitTime[h][m].getDuration()
+                            );
+                        }
+                    }
+                }
+            }
+
+            // scheduleDataList の内容を ToDo オブジェクトに変換して配置
+            for (Pair<String, Integer> data : scheduleDataList) {
+                String name = data.first;
+                int durationMinutes = data.second;
+                int durationUnits = Math.max(1, durationMinutes / 30); // 30分単位に換算
+
+                function.ToDo task = new function.ToDo(name, durationUnits);
+
+                try {
+                    function.decideStartSlotRandom(time, task);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            // * 配置結果をログに出力（確認用）
+            for (int h = 0; h < 24; h++) {
+                for (int m = 0; m < 2; m++) {
+                    if (time[h][m] != null) {
+                        System.out.println(h + "時" + (m == 0 ? "00" : "30") + " → " + time[h][m].getTitle());
+                    }
+                }
+            }
+            //完成した予定表timeをmainactivity2へ送信
+            Intent ResultIntent = new Intent(this, MainActivity2.class);
+            intent.putExtra("time", (Serializable)time);
+
             startActivity(intent);
-        });
+            });
+
+                
+
 
         // 歯車ボタンを押したら Routine アクティビティへ遷移する
         binding.buttonSettings.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, Routine.class);
                 startActivity(intent);
+                System.out.println("oK!");
             }
         });
     }
@@ -84,13 +143,14 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         String scheduleName = editTextScheduleName.getText().toString().trim();
                         String durationStr = editTextScheduleDuration.getText().toString().trim();
+                        //上修正
 
                         if (!scheduleName.isEmpty() && !durationStr.isEmpty()) {
                             try {
                                 int durationMinutes = Integer.parseInt(durationStr);
                                 if (durationMinutes > 0) {
                                     // データリストに追加
-                                    scheduleDataList.add(new Pair<>(scheduleName, durationMinutes + "分"));
+                                    scheduleDataList.add(new Pair<>(scheduleName, durationMinutes ));
                                     // UIを更新
                                     addScheduleItemView(binding.schedulesLinearLayoutContainer, scheduleName, durationMinutes + "分");
                                     dialog.dismiss();
@@ -162,4 +222,3 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
