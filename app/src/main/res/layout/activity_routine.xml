@@ -78,19 +78,22 @@
         app:layout_constraintEnd_toStartOf="@+id/sleepStart"
         app:layout_constraintHorizontal_weight="1.5"/>
 
-    <EditText
+    <TextView
         android:id="@+id/sleepStart"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:ems="10"
         android:hint="HH:mm"
-        android:inputType="time"
+        android:textSize="18sp"
         android:gravity="center"
+        android:background="@android:drawable/edit_text"
+        android:clickable="true"
+        android:focusable="false"
         app:layout_constraintStart_toEndOf="@+id/Sleep"
         app:layout_constraintTop_toTopOf="@id/Sleep"
         app:layout_constraintBottom_toBottomOf="@id/Sleep"
         app:layout_constraintEnd_toStartOf="@+id/sleepDuration"
         app:layout_constraintHorizontal_weight="2"/>
+
 
     <EditText
         android:id="@+id/sleepDuration"
@@ -121,14 +124,16 @@
         app:layout_constraintEnd_toStartOf="@+id/breakfastStart"
         app:layout_constraintHorizontal_weight="1.5"/>
 
-    <EditText
+    <TextView
         android:id="@+id/breakfastStart"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:ems="10"
         android:hint="HH:mm"
-        android:inputType="time"
+        android:textSize="18sp"
         android:gravity="center"
+        android:background="@android:drawable/edit_text"
+        android:clickable="true"
+        android:focusable="false"
         app:layout_constraintStart_toEndOf="@id/breakfast"
         app:layout_constraintTop_toTopOf="@id/breakfast"
         app:layout_constraintBottom_toBottomOf="@id/breakfast"
@@ -163,14 +168,16 @@
         app:layout_constraintEnd_toStartOf="@+id/lunchStart"
         app:layout_constraintHorizontal_weight="1.5"/>
 
-    <EditText
+    <TextView
         android:id="@+id/lunchStart"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:ems="10"
         android:hint="HH:mm"
-        android:inputType="time"
+        android:textSize="18sp"
         android:gravity="center"
+        android:background="@android:drawable/edit_text"
+        android:clickable="true"
+        android:focusable="false"
         app:layout_constraintStart_toEndOf="@id/lunch"
         app:layout_constraintTop_toTopOf="@id/lunch"
         app:layout_constraintBottom_toBottomOf="@id/lunch"
@@ -205,14 +212,16 @@
         app:layout_constraintEnd_toStartOf="@+id/dinnerStart"
         app:layout_constraintHorizontal_weight="1.5"/>
 
-    <EditText
+    <TextView
         android:id="@+id/dinnerStart"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:ems="10"
         android:hint="HH:mm"
-        android:inputType="time"
+        android:textSize="18sp"
         android:gravity="center"
+        android:background="@android:drawable/edit_text"
+        android:clickable="true"
+        android:focusable="false"
         app:layout_constraintStart_toEndOf="@id/dinner"
         app:layout_constraintTop_toTopOf="@id/dinner"
         app:layout_constraintBottom_toBottomOf="@id/dinner"
@@ -247,14 +256,16 @@
         app:layout_constraintEnd_toStartOf="@+id/bathStart"
         app:layout_constraintHorizontal_weight="1.5"/>
 
-    <EditText
+    <TextView
         android:id="@+id/bathStart"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:ems="10"
         android:hint="HH:mm"
-        android:inputType="time"
+        android:textSize="18sp"
         android:gravity="center"
+        android:background="@android:drawable/edit_text"
+        android:clickable="true"
+        android:focusable="false"
         app:layout_constraintStart_toEndOf="@id/bath"
         app:layout_constraintTop_toTopOf="@id/bath"
         app:layout_constraintBottom_toBottomOf="@id/bath"
@@ -289,14 +300,16 @@
         app:layout_constraintEnd_toStartOf="@+id/others1Start"
         app:layout_constraintHorizontal_weight="1.5"/>
 
-    <EditText
+    <TextView
         android:id="@+id/others1Start"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:ems="10"
         android:hint="HH:mm"
-        android:inputType="time"
+        android:textSize="18sp"
         android:gravity="center"
+        android:background="@android:drawable/edit_text"
+        android:clickable="true"
+        android:focusable="false"
         app:layout_constraintStart_toEndOf="@id/others1"
         app:layout_constraintTop_toTopOf="@id/others1"
         app:layout_constraintBottom_toBottomOf="@id/others1"
