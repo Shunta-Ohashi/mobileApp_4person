@@ -5,7 +5,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.NumberPicker;
+import android.widget.TextView;
 import android.widget.Toast; // Toastを正しくインポートする
+import androidx.appcompat.app.AlertDialog; // AlertDialogをインポート
+import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,6 +43,14 @@ public class Routine extends AppCompatActivity {
             return insets;
         });
 
+        binding.sleepStart.setOnClickListener(v -> showTimePickerDialog(binding.sleepStart));
+        binding.breakfastStart.setOnClickListener(v -> showTimePickerDialog(binding.breakfastStart));
+        binding.lunchStart.setOnClickListener(v -> showTimePickerDialog(binding.lunchStart));
+        binding.dinnerStart.setOnClickListener(v -> showTimePickerDialog(binding.dinnerStart));
+        binding.bathStart.setOnClickListener(v -> showTimePickerDialog(binding.bathStart));
+        binding.others1Start.setOnClickListener(v -> showTimePickerDialog(binding.others1Start));
+
+
         binding.SettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,6 +67,55 @@ public class Routine extends AppCompatActivity {
             }
         });
     } // onCreateメソッドの閉じカッコ
+
+    /**
+     * 30分刻みの時刻選択ダイアログを表示するメソッド
+     * @param targetTextView 結果をセットするTextView
+     */
+    private void showTimePickerDialog(final TextView targetTextView) {
+        // ダイアログ用のカスタムビューを生成
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_time_picker, null);
+        final NumberPicker hourPicker = dialogView.findViewById(R.id.hourPicker);
+        final NumberPicker minutePicker = dialogView.findViewById(R.id.minutePicker);
+
+        // 時間の選択肢 (0-23)
+        hourPicker.setMinValue(0);
+        hourPicker.setMaxValue(23);
+
+        // 分の選択肢 (00, 30)
+        final String[] minuteValues = {"00", "30"};
+        minutePicker.setMinValue(0);
+        minutePicker.setMaxValue(minuteValues.length - 1);
+        minutePicker.setDisplayedValues(minuteValues);
+
+
+        // 既存の値があれば初期値に設定
+        String currentTime = targetTextView.getText().toString();
+        if (!currentTime.isEmpty() && currentTime.contains(":")) {
+            String[] timeParts = currentTime.split(":");
+            hourPicker.setValue(Integer.parseInt(timeParts[0]));
+            if (timeParts[1].equals("30")) {
+                minutePicker.setValue(1);
+            } else {
+                minutePicker.setValue(0);
+            }
+        }
+
+
+        // AlertDialogを構築
+        new AlertDialog.Builder(this)
+                .setTitle("時刻を選択")
+                .setView(dialogView)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    int hour = hourPicker.getValue();
+                    String minute = minuteValues[minutePicker.getValue()];
+
+                    String selectedTime = String.format("%d:%s", hour, minute);
+                    targetTextView.setText(selectedTime);
+                })
+                .setNegativeButton("キャンセル", null)
+                .show();
+    }
 
     //入力値durationを30分に変換するメソッド
     private int parseDuration(String text) {
