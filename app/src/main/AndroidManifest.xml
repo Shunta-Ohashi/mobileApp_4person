@@ -20,6 +20,10 @@
             android:exported="true">
         </activity>
         <activity
+            android:name=".TemplateManagerActivity"
+            android:exported="true">
+        </activity>
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
