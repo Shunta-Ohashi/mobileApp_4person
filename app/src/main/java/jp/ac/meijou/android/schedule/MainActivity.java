@@ -8,6 +8,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
@@ -22,6 +26,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
+import java.util.HashSet;
+import java.util.Set;
 
 import jp.ac.meijou.android.schedule.databinding.ActivityMainBinding;
 
@@ -30,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     // 表示するデータのリスト (より構造化されたデータクラスを使うのが理想)
     private final List<Pair<String, Integer>> scheduleDataList = new ArrayList<>();
+    // 保存済みテンプレート (名前, 分)
+    private final List<Pair<String, Integer>> savedTemplates = new ArrayList<>();
+    private static final String PREFS_NAME = "schedule_prefs";
+    private static final String KEY_TEMPLATES = "templates";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +64,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        //予定を追加ボタン
+        //予定を追加ボタン -> 新規作成 or 保存済みテンプレート選択のオプションを表示
+        loadSavedTemplates();
         binding.floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showAddScheduleDialog();
+                showFabOptionsDialog();
             }
         });
 
@@ -121,9 +132,19 @@ public class MainActivity extends AppCompatActivity {
         binding.buttonSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Routine.class);
-                startActivity(intent);
-                System.out.println("oK!");
+                String[] options = new String[]{"設定画面 (Routine)", "テンプレート管理"};
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("メニュー")
+                        .setItems(options, (dialog, which) -> {
+                            if (which == 0) {
+                                Intent intent = new Intent(MainActivity.this, Routine.class);
+                                startActivity(intent);
+                            } else {
+                                Intent intent = new Intent(MainActivity.this, TemplateManagerActivity.class);
+                                startActivity(intent);
+                            }
+                        })
+                        .show();
             }
         });
     }
@@ -151,6 +172,8 @@ public class MainActivity extends AppCompatActivity {
                                 if (durationMinutes > 0) {
                                     // データリストに追加
                                     scheduleDataList.add(new Pair<>(scheduleName, durationMinutes ));
+                                    // テンプレートとして保存（存在しなければ）
+                                    addTemplateIfNotExists(scheduleName, durationMinutes);
                                     // UIを更新
                                     addScheduleItemView(binding.schedulesLinearLayoutContainer, scheduleName, durationMinutes + "分");
                                     dialog.dismiss();
@@ -220,5 +243,144 @@ public class MainActivity extends AppCompatActivity {
             this.first = first;
             this.second = second;
         }
+    }
+
+    // --- Saved templates handling ---
+    private void loadSavedTemplates() {
+        var prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        Set<String> set = prefs.getStringSet(KEY_TEMPLATES, new HashSet<>());
+        savedTemplates.clear();
+        for (String s : set) {
+            // stored as "name::minutes"
+            String[] parts = s.split("::", 2);
+            if (parts.length == 2) {
+                try {
+                    int minutes = Integer.parseInt(parts[1]);
+                    savedTemplates.add(new Pair<>(parts[0], minutes));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        }
+    }
+
+    private void saveTemplates() {
+        var prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        Set<String> set = new HashSet<>();
+        for (Pair<String, Integer> p : savedTemplates) {
+            set.add(p.first + "::" + p.second);
+        }
+        prefs.edit().putStringSet(KEY_TEMPLATES, set).apply();
+    }
+
+    private void addTemplateIfNotExists(String name, int minutes) {
+        for (Pair<String, Integer> p : savedTemplates) {
+            if (p.first.equals(name) && p.second == minutes) return;
+        }
+        savedTemplates.add(new Pair<>(name, minutes));
+        saveTemplates();
+    }
+
+    private void showSavedTemplatesDialog() {
+        loadSavedTemplates();
+        if (savedTemplates.isEmpty()) {
+            // まだテンプレートがない場合は追加ダイアログを開く
+            showAddScheduleDialog();
+            return;
+        }
+        // ListView を使ってタップと長押しを分ける
+        ListView listView = new ListView(this);
+        List<String> labels = new ArrayList<>();
+        for (Pair<String, Integer> p : savedTemplates) {
+            labels.add(p.first + " (" + p.second + "分)");
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, labels);
+        listView.setAdapter(adapter);
+
+        // タップ: そのまま追加
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Pair<String, Integer> sel = savedTemplates.get(position);
+                scheduleDataList.add(new Pair<>(sel.first, sel.second));
+                addScheduleItemView(binding.schedulesLinearLayoutContainer, sel.first, sel.second + "分");
+            }
+        });
+
+        // 長押し: 編集/削除メニューを表示
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+            showTemplateActionDialog(position);
+            return true;
+        });
+
+        new AlertDialog.Builder(this)
+                .setTitle("保存済み予定を選択")
+                .setView(listView)
+                .setNegativeButton("キャンセル", null)
+                .show();
+    }
+
+    private void showTemplateActionDialog(int index) {
+        String[] actions = new String[]{"編集", "削除"};
+        new AlertDialog.Builder(this)
+                .setTitle(savedTemplates.get(index).first + " の操作")
+                .setItems(actions, (dialog, which) -> {
+                    if (which == 0) {
+                        // 編集
+                        showEditTemplateDialog(index);
+                    } else if (which == 1) {
+                        // 削除
+                        savedTemplates.remove(index);
+                        saveTemplates();
+                    }
+                })
+                .setNegativeButton("キャンセル", null)
+                .show();
+    }
+
+    private void showEditTemplateDialog(int index) {
+        Pair<String, Integer> p = savedTemplates.get(index);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_add_schedule, null);
+        final EditText editTextScheduleName = dialogView.findViewById(R.id.editTextScheduleName);
+        final EditText editTextScheduleDuration = dialogView.findViewById(R.id.editTextScheduleDuration);
+        editTextScheduleName.setText(p.first);
+        editTextScheduleDuration.setText(String.valueOf(p.second));
+
+        new AlertDialog.Builder(this)
+                .setTitle("テンプレートを編集")
+                .setView(dialogView)
+                .setPositiveButton("保存", (dialog, which) -> {
+                    String newName = editTextScheduleName.getText().toString().trim();
+                    String durationStr = editTextScheduleDuration.getText().toString().trim();
+                    if (!newName.isEmpty() && !durationStr.isEmpty()) {
+                        try {
+                            int newMinutes = Integer.parseInt(durationStr);
+                            savedTemplates.set(index, new Pair<>(newName, newMinutes));
+                            saveTemplates();
+                        } catch (NumberFormatException e) {
+                            // 無効な数値は無視
+                        }
+                    }
+                })
+                .setNegativeButton("キャンセル", null)
+                .show();
+    }
+
+    private void showFabOptionsDialog() {
+        String[] options = new String[]{"新規で予定を作成", "保存済み予定から選択"};
+        new AlertDialog.Builder(this)
+                .setTitle("予定を追加")
+                .setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            showAddScheduleDialog();
+                        } else if (which == 1) {
+                            showSavedTemplatesDialog();
+                        }
+                    }
+                })
+                .setNegativeButton("キャンセル", null)
+                .show();
     }
 }
