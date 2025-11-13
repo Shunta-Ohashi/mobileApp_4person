@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private final List<Pair<String, Integer>> savedTemplates = new ArrayList<>();
     private static final String PREFS_NAME = "schedule_prefs";
     private static final String KEY_TEMPLATES = "templates";
+    private static function.habit[][] habitTime = null;
+    //習慣からのデータを受け取る配列
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +51,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         Intent habitIntent = getIntent();// 習慣からhabitTime[][]データを受け取る
-        function.habit[][] habitTime = (function.habit[][]) habitIntent.getSerializableExtra("HabitTime");
+        function.habit[][] received = (function.habit[][]) habitIntent.getSerializableExtra("HabitTime");
 
-        if (habitTime != null) {
-            System.out.println("Routine画面からhabitTimeを受け取りました");
+        if (received!= null) {
+            habitTime = received;
+            System.out.println("Routine画面からhabitTimeを受け取りました,またはデータが既に入っています．");
         }
 
         // Window Insets のリスナー設定 (元のコードから)
