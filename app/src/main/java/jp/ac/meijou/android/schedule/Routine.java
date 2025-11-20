@@ -51,6 +51,15 @@ public class Routine extends AppCompatActivity {
         binding.others1Start.setOnClickListener(v -> showTimePickerDialog(binding.others1Start));
 
 
+        // Duration入力欄の設定（キーボード入力を無効化し、ダイアログ選択にする）
+        setupDurationInput(binding.sleepDuration);
+        setupDurationInput(binding.breakfastDuration);
+        setupDurationInput(binding.lunchDuration);
+        setupDurationInput(binding.dinnerDuration);
+        setupDurationInput(binding.bathDuration);
+        setupDurationInput(binding.others1Duration);
+
+
         binding.SettingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,6 +76,44 @@ public class Routine extends AppCompatActivity {
             }
         });
     } // onCreateメソッドの閉じカッコ
+
+    private void setupDurationInput(TextView textView) {
+        textView.setFocusable(false);
+        textView.setClickable(true);
+        textView.setOnClickListener(v -> showDurationPickerDialog(textView));
+    }
+
+    private void showDurationPickerDialog(final TextView targetTextView) {
+        // 30分刻みの選択肢を作成 (30分〜720分(12時間)まで)
+        final String[] durationValues = new String[24];
+        for (int i = 0; i < durationValues.length; i++) {
+            durationValues[i] = String.valueOf((i + 1) * 30);
+        }
+
+        NumberPicker picker = new NumberPicker(this);
+        picker.setMinValue(0);
+        picker.setMaxValue(durationValues.length - 1);
+        picker.setDisplayedValues(durationValues);
+        picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS); // キーボード入力を防ぐ
+
+        // 現在の値があれば初期値に設定
+        String currentVal = targetTextView.getText().toString();
+        for (int i = 0; i < durationValues.length; i++) {
+            if (durationValues[i].equals(currentVal)) {
+                picker.setValue(i);
+                break;
+            }
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("継続時間(分)を選択")
+                .setView(picker)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    targetTextView.setText(durationValues[picker.getValue()]);
+                })
+                .setNegativeButton("キャンセル", null)
+                .show();
+    }
 
     /**
      * 30分刻みの時刻選択ダイアログを表示するメソッド
