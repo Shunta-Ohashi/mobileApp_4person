@@ -62,8 +62,8 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
             int lightBlue = Color.argb(128, 173, 216, 230);
             viewHolder.getScheduleTextView().setBackgroundColor(lightBlue);
         } else if (!"予定はありません".equals(currentItem.getSchedule())) {
-            int red = Color.argb(128, 173, 30, 30);
-            viewHolder.getScheduleTextView().setBackgroundColor(red);
+            int lightYellow = Color.argb(128, 255, 255, 204);
+            viewHolder.getScheduleTextView().setBackgroundColor(lightYellow);
         }
         //用事がないなら背景色を元に戻す
         else {
@@ -75,13 +75,4 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
     public int getItemCount() {
         return localDataSet.size();
     }
-    /*
-    private int getRandomColor() {
-        // Alpha(透明度)は128で固定し、RGB(赤緑青)を0-255の範囲でランダムに生成
-        int r = random.nextInt(256);
-        int g = random.nextInt(256);
-        int b = random.nextInt(256);
-        return Color.argb(128, r, g, b);
-    }
-     */
 }
