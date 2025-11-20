@@ -2,6 +2,7 @@ package jp.ac.meijou.android.schedule;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,8 +22,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton; // FABのインポート
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -40,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
     private final List<Pair<String, Integer>> savedTemplates = new ArrayList<>();
     private static final String PREFS_NAME = "schedule_prefs";
     private static final String KEY_TEMPLATES = "templates";
+    private static final String KEY_HABIT_TIME = "habit_time";
+    private static function.habit[][] habitTime = null;
+    private final Gson gson = new Gson();
+    //習慣からのデータを受け取る配列
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +56,16 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        Intent habitIntent = getIntent();// 習慣からhabitTime[][]データを受け取る
-        function.habit[][] habitTime = (function.habit[][]) habitIntent.getSerializableExtra("HabitTime");
+        // データを読み込む
+        loadHabitTime();
 
-        if (habitTime != null) {
-            System.out.println("Routine画面からhabitTimeを受け取りました");
+        Intent habitIntent = getIntent();// 習慣からhabitTime[][]データを受け取る
+        function.habit[][] received = (function.habit[][]) habitIntent.getSerializableExtra("HabitTime");
+
+        if (received!= null) {
+            habitTime = received;
+            saveHabitTime(); // 受け取ったデータを保存
+            System.out.println("Routine画面からhabitTimeを受け取りました,またはデータが既に入っています．");
         }
 
         // Window Insets のリスナー設定 (元のコードから)
@@ -125,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             });
 
-                
+
 
 
         // 歯車ボタンを押したら Routine アクティビティへ遷移する
@@ -148,6 +161,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void saveHabitTime() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        String json = gson.toJson(habitTime);
+        editor.putString(KEY_HABIT_TIME, json);
+        editor.apply();
+    }
+
+    private void loadHabitTime() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String json = prefs.getString(KEY_HABIT_TIME, null);
+        if (json != null) {
+            Type type = new TypeToken<function.habit[][]>() {}.getType();
+            habitTime = gson.fromJson(json, type);
+        }
+    }
+
 
     private void showAddScheduleDialog() {
         LayoutInflater inflater = LayoutInflater.from(this);
