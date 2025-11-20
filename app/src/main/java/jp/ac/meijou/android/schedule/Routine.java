@@ -84,8 +84,8 @@ public class Routine extends AppCompatActivity {
     }
 
     private void showDurationPickerDialog(final TextView targetTextView) {
-        // 30分刻みの選択肢を作成 (30分〜720分(12時間)まで)
-        final String[] durationValues = new String[24];
+        // 30分刻みの選択肢を作成 (30分〜1440分(24時間)まで)
+        final String[] durationValues = new String[48];
         for (int i = 0; i < durationValues.length; i++) {
             durationValues[i] = String.valueOf((i + 1) * 30);
         }
