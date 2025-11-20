@@ -1,18 +1,21 @@
 package jp.ac.meijou.android.schedule;
 
 import android.graphics.Color;
+import android.telephony.CellIdentity;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
+import java.util.Random;
 
 import jp.ac.meijou.android.schedule.databinding.ItemlistScheduleBinding;
 
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder> {
 
     private final List<Schedule> localDataSet;
+    private final Random random = new Random();
 
     public static class ScheduleViewHolder extends RecyclerView.ViewHolder {
 
@@ -49,11 +52,18 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         viewHolder.getTimeTextView().setText(currentItem.getTime());
         viewHolder.getScheduleTextView().setText(currentItem.getSchedule());
 
-        //もし、何か予定があるなら背景色を変更する
-        //用事ごとに背景色を変更する（予定）
-        if(!"予定はありません".equals(currentItem.getSchedule())) {
+        //習慣のところは水色に設定
+        if("睡眠".equals(currentItem.getSchedule()) ||
+           "朝食".equals(currentItem.getSchedule()) ||
+           "昼食".equals(currentItem.getSchedule()) ||
+           "夕食".equals(currentItem.getSchedule()) ||
+           "お風呂".equals(currentItem.getSchedule()) ||
+           "その他".equals(currentItem.getSchedule())) {
             int lightBlue = Color.argb(128, 173, 216, 230);
             viewHolder.getScheduleTextView().setBackgroundColor(lightBlue);
+        } else if (!"予定はありません".equals(currentItem.getSchedule())) {
+            int lightYellow = Color.argb(128, 255, 255, 204);
+            viewHolder.getScheduleTextView().setBackgroundColor(lightYellow);
         }
         //用事がないなら背景色を元に戻す
         else {
