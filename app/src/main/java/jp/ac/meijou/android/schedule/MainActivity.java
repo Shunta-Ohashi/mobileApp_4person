@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.AdapterView;
 import android.widget.Toast;
+import android.widget.NumberPicker;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
@@ -187,60 +188,55 @@ public class MainActivity extends AppCompatActivity {
         final EditText editTextScheduleName = dialogView.findViewById(R.id.editTextScheduleName);
         final EditText editTextScheduleDuration = dialogView.findViewById(R.id.editTextScheduleDuration);
 
-        new AlertDialog.Builder(this)
+        editTextScheduleDuration.setFocusable(false);
+        editTextScheduleDuration.setClickable(true);
+        editTextScheduleDuration.setOnClickListener(v -> showDurationPickerDialog(editTextScheduleDuration));
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("新しい予定を追加")
                 .setView(dialogView)
-                .setPositiveButton("追加", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String scheduleName = editTextScheduleName.getText().toString().trim();
-                        String durationStr = editTextScheduleDuration.getText().toString().trim();
-                        //上修正
+                .setPositiveButton("追加", null) // リスナーは後で設定して、バリデーションエラー時に閉じないようにする
+                .setNegativeButton("キャンセル", (d, which) -> d.cancel())
+                .create();
 
-                        if (!scheduleName.isEmpty() && !durationStr.isEmpty()) {
-                            try {
-                                int durationMinutes = Integer.parseInt(durationStr);
-                                if (durationMinutes > 0) {
-                                    // データリストに追加
-                                    scheduleDataList.add(new Pair<>(scheduleName, durationMinutes ));
-                                    // テンプレートとして保存（存在しなければ）
-                                    addTemplateIfNotExists(scheduleName, durationMinutes);
-                                    // UIを更新
-                                    addScheduleItemView(binding.schedulesLinearLayoutContainer, scheduleName, durationMinutes + "分");
-                                    dialog.dismiss();
-                                } else {
-                                    // 0以下の時間は無効
-                                    editTextScheduleDuration.setError("0より大きい値を入力してください");
-                                    // ダイアログを閉じないようにするには、onClick内で何もしないか、
-                                    // AlertDialogのButtonを上書きするなどの高度なテクニックが必要
-                                    // ここでは簡潔さのため、エラー表示のみ
-                                }
-                            } catch (NumberFormatException e) {
-                                // 数値変換エラー
-                                editTextScheduleDuration.setError("数値を入力してください");
-                            }
+        dialog.show();
+
+        // PositiveButtonのクリックリスナーを上書き
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String scheduleName = editTextScheduleName.getText().toString().trim();
+            String durationStr = editTextScheduleDuration.getText().toString().trim();
+
+            if (!scheduleName.isEmpty() && !durationStr.isEmpty()) {
+                try {
+                    int durationMinutes = Integer.parseInt(durationStr);
+                    if (durationMinutes > 0 && durationMinutes % 30 == 0) {
+                        // データリストに追加
+                        scheduleDataList.add(new Pair<>(scheduleName, durationMinutes));
+                        // テンプレートとして保存（存在しなければ）
+                        addTemplateIfNotExists(scheduleName, durationMinutes);
+                        // UIを更新
+                        addScheduleItemView(binding.schedulesLinearLayoutContainer, scheduleName, durationMinutes + "分");
+                        dialog.dismiss();
+                    } else {
+                        if (durationMinutes <= 0) {
+                            editTextScheduleDuration.setError("0より大きい値を入力してください");
                         } else {
-                            if (scheduleName.isEmpty()) {
-                                editTextScheduleName.setError("予定名を入力してください");
-                            }
-                            if (durationStr.isEmpty()) {
-                                editTextScheduleDuration.setError("所要時間を入力してください");
-                            }
+                            editTextScheduleDuration.setError("30分単位(30, 60, 90...)で入力してください");
                         }
-                        // Positive Button のデフォルトの動作では、onClickが終了するとダイアログが閉じる。
-                        // エラー時に閉じないようにするには、一手間必要（例：Buttonを取得してカスタムリスナーを設定）
-                        // 今回はシンプルに、エラーがあっても一旦閉じる動作のままとしています。
-                        // もし閉じたくない場合は、AlertDialogの表示後にButtonを取得してsetOnClickListenerを上書きします。
                     }
-                })
-                .setNegativeButton("キャンセル", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                })
-                .create()
-                .show();
+                } catch (NumberFormatException e) {
+                    // 数値変換エラー
+                    editTextScheduleDuration.setError("数値を入力してください");
+                }
+            } else {
+                if (scheduleName.isEmpty()) {
+                    editTextScheduleName.setError("予定名を入力してください");
+                }
+                if (durationStr.isEmpty()) {
+                    editTextScheduleDuration.setError("所要時間を入力してください");
+                }
+            }
+        });
     }
 
     private void addScheduleItemView(LinearLayout container, String label, String value) {
@@ -377,24 +373,48 @@ public class MainActivity extends AppCompatActivity {
         editTextScheduleName.setText(p.first);
         editTextScheduleDuration.setText(String.valueOf(p.second));
 
-        new AlertDialog.Builder(this)
+        editTextScheduleDuration.setFocusable(false);
+        editTextScheduleDuration.setClickable(true);
+        editTextScheduleDuration.setOnClickListener(v -> showDurationPickerDialog(editTextScheduleDuration));
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("テンプレートを編集")
                 .setView(dialogView)
-                .setPositiveButton("保存", (dialog, which) -> {
-                    String newName = editTextScheduleName.getText().toString().trim();
-                    String durationStr = editTextScheduleDuration.getText().toString().trim();
-                    if (!newName.isEmpty() && !durationStr.isEmpty()) {
-                        try {
-                            int newMinutes = Integer.parseInt(durationStr);
-                            savedTemplates.set(index, new Pair<>(newName, newMinutes));
-                            saveTemplates();
-                        } catch (NumberFormatException e) {
-                            // 無効な数値は無視
+                .setPositiveButton("保存", null) // リスナーは後で設定
+                .setNegativeButton("キャンセル", null)
+                .create();
+
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String newName = editTextScheduleName.getText().toString().trim();
+            String durationStr = editTextScheduleDuration.getText().toString().trim();
+            if (!newName.isEmpty() && !durationStr.isEmpty()) {
+                try {
+                    int newMinutes = Integer.parseInt(durationStr);
+                    if (newMinutes > 0 && newMinutes % 30 == 0) {
+                        savedTemplates.set(index, new Pair<>(newName, newMinutes));
+                        saveTemplates();
+                        dialog.dismiss();
+                    } else {
+                        if (newMinutes <= 0) {
+                            editTextScheduleDuration.setError("0より大きい値を入力してください");
+                        } else {
+                            editTextScheduleDuration.setError("30分単位(30, 60, 90...)で入力してください");
                         }
                     }
-                })
-                .setNegativeButton("キャンセル", null)
-                .show();
+                } catch (NumberFormatException e) {
+                    editTextScheduleDuration.setError("数値を入力してください");
+                }
+            } else {
+                if (newName.isEmpty()) {
+                    editTextScheduleName.setError("予定名を入力してください");
+                }
+                if (durationStr.isEmpty()) {
+                    editTextScheduleDuration.setError("所要時間を入力してください");
+                }
+            }
+        });
     }
 
     private void showFabOptionsDialog() {
@@ -410,6 +430,36 @@ public class MainActivity extends AppCompatActivity {
                             showSavedTemplatesDialog();
                         }
                     }
+                })
+                .setNegativeButton("キャンセル", null)
+                .show();
+    }
+
+    private void showDurationPickerDialog(final TextView targetTextView) {
+        final String[] durationValues = new String[48]; // 30分〜24時間
+        for (int i = 0; i < durationValues.length; i++) {
+            durationValues[i] = String.valueOf((i + 1) * 30);
+        }
+
+        NumberPicker picker = new NumberPicker(this);
+        picker.setMinValue(0);
+        picker.setMaxValue(durationValues.length - 1);
+        picker.setDisplayedValues(durationValues);
+        picker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+
+        String currentVal = targetTextView.getText().toString();
+        for (int i = 0; i < durationValues.length; i++) {
+            if (durationValues[i].equals(currentVal)) {
+                picker.setValue(i);
+                break;
+            }
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("所要時間(分)を選択")
+                .setView(picker)
+                .setPositiveButton("OK", (dialog, which) -> {
+                    targetTextView.setText(durationValues[picker.getValue()]);
                 })
                 .setNegativeButton("キャンセル", null)
                 .show();

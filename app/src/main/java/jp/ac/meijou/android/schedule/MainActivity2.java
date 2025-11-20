@@ -1,6 +1,7 @@
 package jp.ac.meijou.android.schedule;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -10,13 +11,20 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import jp.ac.meijou.android.schedule.databinding.ActivityMain2Binding;
 
 public class MainActivity2 extends AppCompatActivity {
 
     private ActivityMain2Binding binding;
+    private static final String PREFS_NAME = "schedule_prefs";
+    private static final String KEY_SCHEDULE_LIST = "schedule_list_json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +97,38 @@ public class MainActivity2 extends AppCompatActivity {
         ScheduleAdapter adapter = new ScheduleAdapter(scheduleData);
         binding.recyclerView.setAdapter(adapter);
 
+        // データを保存
+        saveScheduleData(scheduleData);
+
     // 戻るボタン
         binding.buttonBack.setOnClickListener(view -> {
             var intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void saveScheduleData(List<Schedule> data) {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        JSONArray jsonArray = new JSONArray();
+        for (Schedule s : data) {
+            try {
+                JSONObject obj = new JSONObject();
+                obj.put("time", s.getTime());
+                obj.put("schedule", s.getSchedule());
+                jsonArray.put(obj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        prefs.edit().putString(KEY_SCHEDULE_LIST, jsonArray.toString()).apply();
+        
+        // ウィジェットの更新をリクエスト
+        Intent intent = new Intent(this, ScheduleWidget.class);
+        intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+        // 実際のID取得などはWidgetManager経由で行うのが正式だが、
+        // ここでは単純にブロードキャストを送るか、Widgetクラス側で自動更新させる。
+        // 今回はデータ保存のみ行い、Widget側でonUpdate時に読み込む形にする。
+        // ただし、即時反映させるためにブロードキャストを送るのが親切。
+        sendBroadcast(intent);
     }
 }
