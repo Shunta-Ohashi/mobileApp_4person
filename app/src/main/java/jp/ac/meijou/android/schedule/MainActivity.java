@@ -211,11 +211,12 @@ public class MainActivity extends AppCompatActivity {
                     int durationMinutes = Integer.parseInt(durationStr);
                     if (durationMinutes > 0 && durationMinutes % 30 == 0) {
                         // データリストに追加
-                        scheduleDataList.add(new Pair<>(scheduleName, durationMinutes));
+                        Pair<String, Integer> newItem = new Pair<>(scheduleName, durationMinutes);
+                        scheduleDataList.add(newItem);
                         // テンプレートとして保存（存在しなければ）
                         addTemplateIfNotExists(scheduleName, durationMinutes);
                         // UIを更新
-                        addScheduleItemView(binding.schedulesLinearLayoutContainer, scheduleName, durationMinutes + "分");
+                        addScheduleItemView(binding.schedulesLinearLayoutContainer, newItem);
                         dialog.dismiss();
                     } else {
                         if (durationMinutes <= 0) {
@@ -239,15 +240,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void addScheduleItemView(LinearLayout container, String label, String value) {
+    private void addScheduleItemView(LinearLayout container, Pair<String, Integer> item) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View itemView = inflater.inflate(R.layout.item_schedule, container, false);
 
         TextView textLabel = itemView.findViewById(R.id.itemTextLabel);
         TextView textValue = itemView.findViewById(R.id.itemTextValue);
+        View deleteButton = itemView.findViewById(R.id.deleteButton);
 
-        textLabel.setText(label);
-        textValue.setText(value);
+        textLabel.setText(item.first);
+        textValue.setText(item.second + "分");
+
+        deleteButton.setOnClickListener(v -> {
+            scheduleDataList.remove(item);
+            container.removeView(itemView);
+        });
 
         container.addView(itemView);
     }
@@ -328,8 +335,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Pair<String, Integer> sel = savedTemplates.get(position);
-                scheduleDataList.add(new Pair<>(sel.first, sel.second));
-                addScheduleItemView(binding.schedulesLinearLayoutContainer, sel.first, sel.second + "分");
+                Pair<String, Integer> newItem = new Pair<>(sel.first, sel.second);
+                scheduleDataList.add(newItem);
+                addScheduleItemView(binding.schedulesLinearLayoutContainer, newItem);
             }
         });
 
